@@ -17,21 +17,15 @@ export class ProductsService {
     const precoNumber = Number(preco);
     const quantidadeNumber = Number(quantidade);
 
-    if (
-      !nome ||
-      !precoNumber ||
-      precoNumber === undefined ||
-      !quantidadeNumber ||
-      quantidadeNumber === undefined
-    ) {
-      throw new BadRequestException('Missing required fields');
+    if (!nome) {
+      throw new BadRequestException('Name is required');
     }
 
-    if (typeof precoNumber !== 'number' || precoNumber <= 0) {
+    if (isNaN(precoNumber) || precoNumber <= 0) {
       throw new BadRequestException('Price must be a positive number');
     }
 
-    if (typeof quantidadeNumber !== 'number' || quantidadeNumber < 0) {
+    if (isNaN(quantidadeNumber) || quantidadeNumber < 0) {
       throw new BadRequestException('Quantity must be a non-negative number');
     }
   }

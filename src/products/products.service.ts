@@ -12,6 +12,30 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  private validateProductData(createProductDto: CreateProductDto) {
+    const { nome, preco, quantidade } = createProductDto;
+    const precoNumber = Number(preco);
+    const quantidadeNumber = Number(quantidade);
+
+    if (
+      !nome ||
+      !precoNumber ||
+      precoNumber === undefined ||
+      !quantidadeNumber ||
+      quantidadeNumber === undefined
+    ) {
+      throw new BadRequestException('Missing required fields');
+    }
+
+    if (typeof precoNumber !== 'number' || precoNumber <= 0) {
+      throw new BadRequestException('Price must be a positive number');
+    }
+
+    if (typeof quantidadeNumber !== 'number' || quantidadeNumber < 0) {
+      throw new BadRequestException('Quantity must be a non-negative number');
+    }
+  }
+
   async findById(id: number) {
     try {
       const product = await this.prismaService.produto.findUnique({
@@ -33,6 +57,8 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
     try {
+      this.validateProductData(createProductDto);
+
       const productAlreadyExists = await this.prismaService.produto.findFirst({
         where: {
           nome: createProductDto.nome,
